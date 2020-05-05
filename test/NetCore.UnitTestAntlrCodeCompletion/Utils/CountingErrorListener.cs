@@ -1,3 +1,4 @@
+using System.IO;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 
@@ -16,9 +17,9 @@ namespace NetCore.UnitTestAntlrCodeCompletion.Utils
     {
         public int ErrorCount { get; set; } = 0;
 
-        public override void SyntaxError([NotNull] IRecognizer recognizer, [Nullable] IToken offendingSymbol, int line, int charPositionInLine, [NotNull] string msg, [Nullable] RecognitionException e)
+        public override void SyntaxError(TextWriter output, IRecognizer recognizer, IToken offendingSymbol, int line, int charPositionInLine, string msg, RecognitionException e)
         {
-            base.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
+            base.SyntaxError(output, recognizer, offendingSymbol, line, charPositionInLine, msg, e);
             this.ErrorCount++;
         }
     }

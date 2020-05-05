@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "editorconfig.editorconfig",
+        "christian-kohler.path-intellisense",
+        "streetsidesoftware.code-spell-checker",
+    ]
+}

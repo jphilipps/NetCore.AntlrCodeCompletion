@@ -72,7 +72,7 @@ namespace NetCore.AntlrCodeCompletion
             this.candidates.Tokens.Clear();
             this.statesProcessed = 0;
 
-            this.tokenStartIndex = context != null ? context.start.TokenIndex : 0;
+            this.tokenStartIndex = context != null ? context.Start.TokenIndex : 0;
             var tokenStream = this.parser.InputStream as ITokenStream;
 
             var currentIndex = tokenStream.Index;
@@ -82,10 +82,10 @@ namespace NetCore.AntlrCodeCompletion
 
             while (true)
             {
-                var token = tokenStream.Lt(offset++);
+                var token = tokenStream.LT(offset++);
                 this.tokens.Add(token);
 
-                if (token.TokenIndex >= caretTokenIndex || token.Type == TokenConstants.Eof)
+                if (token.TokenIndex >= caretTokenIndex || token.Type == TokenConstants.EOF)
                 {
                     break;
                 }
@@ -126,7 +126,7 @@ namespace NetCore.AntlrCodeCompletion
                 var startOffset = this.tokens[startToken].StartIndex;
                 int endOffset;
 
-                if (this.tokens[endToken].Type == TokenConstants.Eof)
+                if (this.tokens[endToken].Type == TokenConstants.EOF)
                 {
                     // if last token is EOF, include trailing whitespace
                     endOffset = this.tokens[endToken].StartIndex;
@@ -218,9 +218,9 @@ namespace NetCore.AntlrCodeCompletion
                 var state = pipeline.Last();
                 pipeline.RemoveLast();
 
-                foreach (var transition in state.Transitions)
+                foreach (var transition in state.TransitionsArray)
                 {
-                    if (transition.TransitionType == TransitionType.Atom)
+                    if (transition.TransitionType == TransitionType.ATOM)
                     {
                         if (!transition.IsEpsilon)
                         {
@@ -274,16 +274,16 @@ namespace NetCore.AntlrCodeCompletion
             {
                 var set = new FollowSetWithPath
                 {
-                    Intervals = IntervalSet.Of(TokenConstants.Epsilon),
+                    Intervals = IntervalSet.Of(TokenConstants.EPSILON),
                     Path = new List<int>(ruleStack)
                 };
                 followSets.AddLast(set);
                 return;
             }
 
-            foreach (var transition in startState.Transitions)
+            foreach (var transition in startState.TransitionsArray)
             {
-                if (transition.TransitionType == TransitionType.Rule)
+                if (transition.TransitionType == TransitionType.RULE)
                 {
                     var ruleTransition = (RuleTransition)transition;
                     if (ruleStack.Find(ruleTransition.target.ruleIndex) != null)
@@ -296,7 +296,7 @@ namespace NetCore.AntlrCodeCompletion
                     ruleStack.RemoveLast();
 
                 }
-                else if (transition.TransitionType == TransitionType.Predicate)
+                else if (transition.TransitionType == TransitionType.PREDICATE)
                 {
                     if (this.CheckPredicate((PredicateTransition)transition))
                     {
@@ -307,7 +307,7 @@ namespace NetCore.AntlrCodeCompletion
                 {
                     this.CollectFollowSets(transition.target, stopState, followSets, seen, ruleStack);
                 }
-                else if (transition.TransitionType == TransitionType.Wildcard)
+                else if (transition.TransitionType == TransitionType.WILDCARD)
                 {
                     var set = new FollowSetWithPath
                     {
@@ -321,7 +321,7 @@ namespace NetCore.AntlrCodeCompletion
                     var label = transition.Label;
                     if (label != null && label.Count > 0)
                     {
-                        if (transition.TransitionType == TransitionType.NotSet)
+                        if (transition.TransitionType == TransitionType.NOT_SET)
                         {
                             label = label.Complement(IntervalSet.Of(TokenConstants.MinUserTokenType, this.atn.maxTokenType));
                         }
@@ -450,7 +450,7 @@ namespace NetCore.AntlrCodeCompletion
                 // Process the rule if we either could pass it without consuming anything (epsilon transition)
                 // or if the current input symbol will be matched somewhere after this entry point.
                 // Otherwise stop here.
-                if (!followSets.Combined.Contains(TokenConstants.Epsilon) && !followSets.Combined.Contains(currentSymbol))
+                if (!followSets.Combined.Contains(TokenConstants.EPSILON) && !followSets.Combined.Contains(currentSymbol))
                 {
                     callStack.RemoveLast();
                     return result;
@@ -491,102 +491,102 @@ namespace NetCore.AntlrCodeCompletion
                         break;
                 }
 
-                var transitions = currentEntry.State.Transitions;
+                var transitions = currentEntry.State.TransitionsArray;
                 foreach (var transition in transitions)
                 {
                     switch (transition.TransitionType)
                     {
-                        case TransitionType.Rule:
-                        {
-                            var endStatus = this.ProcessRule(transition.target, currentEntry.TokenIndex, callStack, indentation);
-                            foreach (var position in endStatus)
+                        case TransitionType.RULE:
                             {
-                                statePipeline.AddLast(new PipelineEntry(((RuleTransition)transition).followState, position));
-                            }
-                            break;
-                        }
-
-                        case TransitionType.Predicate:
-                        {
-                            if (this.CheckPredicate((PredicateTransition)transition))
-                            {
-                                statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex));
-                            }
-                            break;
-                        }
-
-                        case TransitionType.Wildcard:
-                        {
-                            if (atCaret)
-                            {
-                                if (!this.TranslateToRuleIndex(callStack.ToList()))
+                                var endStatus = this.ProcessRule(transition.target, currentEntry.TokenIndex, callStack, indentation);
+                                foreach (var position in endStatus)
                                 {
-                                    foreach (var token in IntervalSet.Of(TokenConstants.MinUserTokenType, this.atn.maxTokenType).ToList())
-                                    {
-                                        if (!this.ignoredTokens.Contains(token))
-                                        {
-                                            this.candidates.Tokens[token] = new List<int>();
-                                        }
-                                    }
+                                    statePipeline.AddLast(new PipelineEntry(( (RuleTransition)transition ).followState, position));
                                 }
-                            }
-                            else
-                            {
-                                statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex + 1));
-                            }
-                            break;
-                        }
-
-                        default:
-                        {
-                            if (transition.IsEpsilon)
-                            {
-                                // Jump over simple states with a single outgoing epsilon transition.
-                                statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex));
-                                continue;
+                                break;
                             }
 
-                            var set = transition.Label;
-                            if (set != null && set.Count > 0)
+                        case TransitionType.PREDICATE:
                             {
-                                if (transition.TransitionType == TransitionType.NotSet)
+                                if (this.CheckPredicate((PredicateTransition)transition))
                                 {
-                                    set = set.Complement(IntervalSet.Of(TokenConstants.MinUserTokenType, this.atn.maxTokenType));
+                                    statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex));
                                 }
+                                break;
+                            }
 
+                        case TransitionType.WILDCARD:
+                            {
                                 if (atCaret)
                                 {
                                     if (!this.TranslateToRuleIndex(callStack.ToList()))
                                     {
-                                        var list = set.ToList();
-                                        var isAddFollowing = list.Count == 1;
-
-                                        foreach (var symbol in list)
+                                        foreach (var token in IntervalSet.Of(TokenConstants.MinUserTokenType, this.atn.maxTokenType).ToList())
                                         {
-                                            if (!this.ignoredTokens.Contains(symbol))
+                                            if (!this.ignoredTokens.Contains(token))
                                             {
-                                                if (isAddFollowing)
-                                                {
-                                                    this.candidates.Tokens[symbol] = this.GetFollowingTokens(transition);
-                                                }
-                                                else
-                                                {
-                                                    this.candidates.Tokens[symbol] = new List<int>();
-                                                }
+                                                this.candidates.Tokens[token] = new List<int>();
                                             }
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    if (set.Contains(currentSymbol))
+                                    statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex + 1));
+                                }
+                                break;
+                            }
+
+                        default:
+                            {
+                                if (transition.IsEpsilon)
+                                {
+                                    // Jump over simple states with a single outgoing epsilon transition.
+                                    statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex));
+                                    continue;
+                                }
+
+                                var set = transition.Label;
+                                if (set != null && set.Count > 0)
+                                {
+                                    if (transition.TransitionType == TransitionType.NOT_SET)
                                     {
-                                        statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex + 1));
+                                        set = set.Complement(IntervalSet.Of(TokenConstants.MinUserTokenType, this.atn.maxTokenType));
+                                    }
+
+                                    if (atCaret)
+                                    {
+                                        if (!this.TranslateToRuleIndex(callStack.ToList()))
+                                        {
+                                            var list = set.ToList();
+                                            var isAddFollowing = list.Count == 1;
+
+                                            foreach (var symbol in list)
+                                            {
+                                                if (!this.ignoredTokens.Contains(symbol))
+                                                {
+                                                    if (isAddFollowing)
+                                                    {
+                                                        this.candidates.Tokens[symbol] = this.GetFollowingTokens(transition);
+                                                    }
+                                                    else
+                                                    {
+                                                        this.candidates.Tokens[symbol] = new List<int>();
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (set.Contains(currentSymbol))
+                                        {
+                                            statePipeline.AddLast(new PipelineEntry(transition.target, currentEntry.TokenIndex + 1));
+                                        }
                                     }
                                 }
                             }
-                        }
-                        break;
+                            break;
                     }
                 }
             }

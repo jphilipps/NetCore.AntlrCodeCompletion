@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Atn;
+using Grammar;
 using NetCore.AntlrCodeCompletion;
-using NetCore.UnitTestAntlrCodeCompletion.Grammar;
 using NetCore.UnitTestAntlrCodeCompletion.Utils;
 using NFluent;
 using Xunit;
@@ -100,7 +100,7 @@ namespace NetCore.UnitTestAntlrCodeCompletion
             var lexer = new ExprLexer(inputStream);
             var tokenStream = new CommonTokenStream(lexer);
             var parser = new ExprParser(tokenStream);
-            parser.Interpreter.PredictionMode = PredictionMode.LlExactAmbigDetection;
+            parser.Interpreter.PredictionMode = PredictionMode.LL_EXACT_AMBIG_DETECTION;
 
             lexer.RemoveErrorListeners();
             parser.RemoveErrorListeners();
@@ -169,16 +169,16 @@ namespace NetCore.UnitTestAntlrCodeCompletion
                 switch (candidate.Key)
                 {
                     case ExprParser.RULE_functionRef:
-                    {
-                        found++;
-                        break;
-                    }
+                        {
+                            found++;
+                            break;
+                        }
 
                     case ExprParser.RULE_variableRef:
-                    {
-                        found++;
-                        break;
-                    }
+                        {
+                            found++;
+                            break;
+                        }
                 }
             }
 
@@ -196,16 +196,16 @@ namespace NetCore.UnitTestAntlrCodeCompletion
                 switch (candidate.Key)
                 {
                     case ExprParser.RULE_functionRef:
-                    {
-                        found++;
-                        break;
-                    }
+                        {
+                            found++;
+                            break;
+                        }
 
                     case ExprParser.RULE_variableRef:
-                    {
-                        found++;
-                        break;
-                    }
+                        {
+                            found++;
+                            break;
+                        }
                 }
             }
 

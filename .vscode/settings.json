@@ -1,0 +1,53 @@
+{
+    "git.ignoreLimitWarning": true,
+    "editor.rulers": [79],
+    "files.trimFinalNewlines": true,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/artifacts/": true,
+        "**/.awcache": true,
+        "**/.DS_Store": true,
+        "**/bin": true,
+        "**/obj": true,
+        "**/.ionide": true,
+        "**/.vs": true
+    },
+    "antlr4.referencesCodeLens.enabled": true,
+    "antlr4.generation": {
+      "language": "CSharp",
+      "listeners": true,
+      "visitors": true,
+      "outputDir": "../Generation",
+      "mode": "external",
+      "package": "Grammar"
+    },
+    "antlr4.format": {
+      "alignTrailingComments": false,
+      "allowShortBlocksOnASingleLine": true,
+      "breakBeforeBraces": false,
+      "columnLimit": 80,
+      "continuationIndentWidth": 4,
+      "indentWidth": 4,
+      "keepEmptyLinesAtTheStartOfBlocks": false,
+      "maxEmptyLinesToKeep": 1,
+      "reflowComments": true,
+      "spaceBeforeAssignmentOperators": true,
+      "tabWidth": 4,
+      "useTab": true,
+      "alignColons": "none",
+      "singleLineOverrulesHangingColon": true,
+      "allowShortRulesOnASingleLine": true,
+      "alignSemicolons": "none",
+      "breakBeforeParens": false,
+      "ruleInternalsOnSingleLine": false,
+      "minEmptyLines": 0,
+      "groupedAlignments": true,
+      "alignFirstTokens": false,
+      "alignLexerCommands": false,
+      "alignActions": false,
+      "alignLabels": true,
+      "alignTrailers": false
+    }
+}
